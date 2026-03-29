@@ -52,17 +52,13 @@ jobs:
           export use_mail_wasm_parser=${{ secrets.BACKEND_USE_MAIL_WASM_PARSER }}
           
           cd worker/
-          # 优先使用仓库中的 worker/wrangler.repo.toml；若不存在则回退到 BACKEND_TOML 以便回滚
-          if [ -f wrangler.repo.toml ]; then
-            cp wrangler.repo.toml wrangler.toml
-            echo "Using repository worker/wrangler.repo.toml"
-          else
-            if [ -z "$WRANGLER_TOML_CONTENT" ]; then
-              echo "wrangler.repo.toml missing and BACKEND_TOML secret is empty"
-              exit 1
-            fi
-            printf '%s\n' "$WRANGLER_TOML_CONTENT" > wrangler.toml
+          # 使用仓库中的 worker/wrangler.repo.toml 作为唯一的非敏感后端配置来源
+          if [ ! -f wrangler.repo.toml ]; then
+            echo "worker/wrangler.repo.toml is required"
+            exit 1
           fi
+          cp wrangler.repo.toml wrangler.toml
+          echo "Using repository worker/wrangler.repo.toml"
           
           pnpm install --no-frozen-lockfile
 
