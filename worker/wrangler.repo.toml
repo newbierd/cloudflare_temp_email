@@ -12,7 +12,7 @@ run_worker_first = true
 [vars]
 PREFIX = "nb"
 TITLE = "Newbie 临时邮箱"
-DEFAULT_DOMAINS = ["niubie.de"]
+DEFAULT_DOMAINS = ["newbie.ma"]
 DOMAINS = ["newbie.ma", "niubi.ma", "niubie.de", "newbiee.de", "nmdd.de", "newbie.edu.kg"]
 ENABLE_USER_CREATE_EMAIL = true
 ENABLE_USER_DELETE_EMAIL = true

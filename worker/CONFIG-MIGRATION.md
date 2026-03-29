@@ -18,5 +18,8 @@ If `worker/wrangler.toml` is removed, the workflow will still fall back to `BACK
   - `JWT_SECRET`
   - `ADMIN_PASSWORDS`
   - `TELEGRAM_BOT_TOKEN`
-- Keep non-sensitive structure in `worker/wrangler.toml`
+- Keep non-sensitive structure in `worker/wrangler.repo.toml`
 - After validation, retire `BACKEND_TOML`
+
+## Phase 2 note
+- `DEFAULT_DOMAINS` switched from `niubie.de` to `newbie.ma` to match the current primary site/domain.
