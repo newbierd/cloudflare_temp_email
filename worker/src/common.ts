@@ -2,7 +2,7 @@ import { Context } from 'hono';
 import { Jwt } from 'hono/utils/jwt'
 import { WorkerMailerOptions } from 'worker-mailer';
 
-import { getBooleanValue, getDomains, getStringValue, getIntValue, getUserRoles, getDefaultDomains, getJsonSetting, getAnotherWorkerList, hashPassword, getJsonObjectValue, getRandomSubdomainDomains } from './utils';
+import { getBooleanValue, getDomains, getStringArray, getStringValue, getIntValue, getUserRoles, getDefaultDomains, getJsonSetting, getAnotherWorkerList, hashPassword, getJsonObjectValue, getRandomSubdomainDomains } from './utils';
 import { unbindTelegramByAddress } from './telegram_api/common';
 import { CONSTANTS } from './constants';
 import { AddressCreationSettings, AdminWebhookSettings, WebhookMail, WebhookSettings } from './models';
@@ -44,9 +44,24 @@ export const isSendMailEnabled = (
     if (smtpConfigMap && smtpConfigMap[mailDomain]) return true;
 
     // Check SEND_MAIL binding
-    if (c.env.SEND_MAIL) return true;
+    if (isSendMailBindingEnabled(c, mailDomain)) return true;
 
     return false;
+}
+
+export const isSendMailBindingEnabled = (
+    c: Context<HonoCustomType>,
+    mailDomain: string
+): boolean => {
+    if (!c.env.SEND_MAIL) {
+        return false;
+    }
+    const sendMailDomains = getStringArray(c.env.SEND_MAIL_DOMAINS)
+        .map((domain) => normalizeDomainValue(domain));
+    if (sendMailDomains.length === 0) {
+        return true;
+    }
+    return sendMailDomains.includes(normalizeDomainValue(mailDomain));
 }
 
 /**
@@ -728,13 +743,13 @@ export const commonGetUserRole = async (
 export const getAddressPrefix = async (c: Context<HonoCustomType>): Promise<string | undefined> => {
     const user = c.get("userPayload");
     if (!user) {
-        return getStringValue(c.env.PREFIX);
+        return getStringValue(c.env.PREFIX).trim().toLowerCase();
     }
     const user_role = await commonGetUserRole(c, user.user_id);
     if (typeof user_role?.prefix === "string") {
-        return user_role.prefix;
+        return user_role.prefix.trim().toLowerCase();
     }
-    return getStringValue(c.env.PREFIX);
+    return getStringValue(c.env.PREFIX).trim().toLowerCase();
 }
 
 export const getAllowDomains = async (c: Context<HonoCustomType>): Promise<string[]> => {
